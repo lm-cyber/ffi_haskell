@@ -1,4 +1,7 @@
 ## [origin rep(haskell-from-python) ](https://github.com/nh2/haskell-from-python)
+# i fix some code and extend example 
+
+
 
 haskell-from-python
 ===================
