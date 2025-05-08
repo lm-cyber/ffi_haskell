@@ -1,0 +1,31 @@
+GHCDIR = $(shell ghc --print-libdir)
+RTSDIR = $(shell find $(GHCDIR) -name HsFFI.h -exec dirname {} \;)
+GHC_VERSION = $(shell ghc --numeric-version)
+GHC = ghc
+GCC = gcc
+
+all: testlib.so
+	LD_LIBRARY_PATH=.:$(GHCDIR)/lib/x86_64-linux-ghc-$(GHC_VERSION) python load_test.py
+
+# Compile Haskell code - this generates the stub files
+HsBridge.o HsBridge_stub.h: HsBridge.hs
+	$(GHC) -c -dynamic -fPIC HsBridge.hs
+
+# Compile Haskell bridge C code
+hsbridge.o: hsbridge.c HsBridge_stub.h
+	$(GCC) -c -fPIC $< -I$(RTSDIR)
+
+# Compile main C code
+mlib.o: mlib.c
+	$(GCC) -c -fPIC $< 
+
+# First create a shared library from just the Haskell code
+libhsbridge.so: HsBridge.o
+	$(GHC) -shared -dynamic -fPIC -o $@ $^
+
+# Then link the C code with the Haskell library
+testlib.so: mlib.o hsbridge.o libhsbridge.so
+	$(GCC) -shared -o $@ mlib.o hsbridge.o -L. -lhsbridge -Wl,-rpath,'$$ORIGIN'
+
+clean:
+	rm -f *.o *.hi *_stub.* *.so

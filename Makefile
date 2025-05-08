@@ -1,8 +1,7 @@
 GHC=ghc
-GHC_RUNTIME_LINKER_FLAG=-L/home/void/.ghcup/ghc/9.6.7/lib/ghc-9.6.7/lib/x86_64-linux-ghc-9.6.7/ -lHSrts-1.0.2-ghc9.6.7
 
 libffi-example.so: Example.o wrapper.o
-	$(GHC) -o $@ -shared -dynamic -fPIC $^ $(GHC_RUNTIME_LINKER_FLAG)
+	$(GHC) -o $@ -shared -dynamic -fPIC $^  -flink-rts 
 
 Example_stub.h Example.o: Example.hs
 	$(GHC) -c -dynamic -fPIC Example.hs
