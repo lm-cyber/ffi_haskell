@@ -6,7 +6,7 @@ lib = cdll.LoadLibrary("./libffi-example.so")
 lib.checkStringHS.argtypes = [c_char_p]
 lib.checkStringHS.restype = c_char_p
 
-lib.example_init()
+lib.hs_init(0, 0)
 
 for x in range(4,8):
     print( lib.fibonacciHS(x))
@@ -18,4 +18,4 @@ result = lib.checkStringHS(input_str.encode('utf-8'))
 if result:
     print(result.decode('utf-8'))
 
-lib.example_exit()
+lib.hs_exit()
